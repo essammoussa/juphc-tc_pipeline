@@ -36,7 +36,7 @@ spec:
         - name: revision
           value: $(params.revision)
 
-    - name: npm-install
+    - name: npminstall
       taskRef:
         name: npm-install
       runAfter:
@@ -45,20 +45,20 @@ spec:
         - name: source
           workspace: shared-workspace
 
-    - name: run-jasmine-tests
+    - name: tests
       taskRef:
         name: run-jasmine-tests
       runAfter:
-        - npm-install
+        - npminstall
       workspaces:
         - name: source
           workspace: shared-workspace
 
-    - name: build-and-push
+    - name: build
       taskRef:
         name: build-and-push
       runAfter:
-        - run-jasmine-tests
+        - tests
       workspaces:
         - name: source
           workspace: shared-workspace
@@ -70,7 +70,7 @@ spec:
       taskRef:
         name: deploy-code-engine
       runAfter:
-        - build-and-push
+        - build
       params:
         - name: image
           value: $(params.image)

@@ -7,7 +7,7 @@ spec:
     name: tax-calculator-pipeline
   params:
     - name: repo-url
-      value: "https://github.com/essammoussa/tax-calculator.git"
+      value: "https://github.com/essammoussa/juphc-tc_pipeline.git"
     - name: revision
       value: "main"
     - name: image
