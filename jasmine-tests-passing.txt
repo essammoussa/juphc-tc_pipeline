@@ -1,0 +1,7 @@
+$ npx jasmine
+Started
+...........
+
+
+11 specs, 0 failures
+Finished in 0.007 seconds
