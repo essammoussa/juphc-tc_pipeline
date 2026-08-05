@@ -1,0 +1,53 @@
+# pipeline/tekton/tasks/deploy-code-engine-task.yaml
+#
+# Deploys (or updates) the Code Engine application using the image
+# that was just built and pushed. Only reached if build-and-push
+# succeeded, which itself only ran if run-unit-tests succeeded.
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-code-engine
+spec:
+  params:
+    - name: image
+      description: Full image reference to deploy
+      type: string
+    - name: app-name
+      description: Code Engine application name
+      type: string
+      default: tax-calculator
+    - name: project
+      description: Code Engine project name
+      type: string
+  steps:
+    - name: deploy
+      image: icr.io/codeengine/ibmcloud:latest
+      env:
+        - name: IBMCLOUD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ibmcloud-api-key
+              key: apikey
+      script: |
+        #!/bin/sh
+        set -eu
+        ibmcloud login --apikey "$IBMCLOUD_API_KEY" -r us-south
+        ibmcloud ce project select --name "$(params.project)"
+
+        if ibmcloud ce application get --name "$(params.app-name)" >/dev/null 2>&1; then
+          echo "Application exists, updating with new image..."
+          ibmcloud ce application update \
+            --name "$(params.app-name)" \
+            --image "$(params.image)"
+        else
+          echo "Application does not exist, creating it..."
+          ibmcloud ce application create \
+            --name "$(params.app-name)" \
+            --image "$(params.image)" \
+            --port 3000 \
+            --min-scale 1 \
+            --max-scale 3
+        fi
+
+        echo "Deployed. Public URL:"
+        ibmcloud ce application get --name "$(params.app-name)" -o url

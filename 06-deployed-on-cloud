@@ -1,0 +1,8 @@
+$ ibmcloud ce application create --name tax-calculator --image us.icr.io/tax-calc-namespace/tax-calculator:latest --registry-secret icr-secret --port 80
+Creating application 'tax-calculator'...
+Waiting for application 'tax-calculator' to become ready...
+Run 'ibmcloud ce application get -n tax-calculator' to check the application status.
+OK
+
+URL: https://tax-calculator.123456789.us-south.codeengine.appdomain.cloud
+Status: Ready

@@ -1,0 +1,80 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: tax-calculator-pipeline
+spec:
+  params:
+    - name: repo-url
+      type: string
+      description: Git repository URL for the Tax Calculator app
+    - name: revision
+      type: string
+      default: main
+    - name: image
+      type: string
+      description: Full image reference to build/push/deploy, e.g. us.icr.io/mynamespace/tax-calculator:latest
+    - name: app-name
+      type: string
+      default: tax-calculator
+    - name: ce-project
+      type: string
+      description: IBM Cloud Code Engine project name
+
+  workspaces:
+    - name: shared-workspace
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: fetch-repository
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+
+    - name: npm-install
+      taskRef:
+        name: npm-install
+      runAfter:
+        - fetch-source
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: run-jasmine-tests
+      taskRef:
+        name: run-jasmine-tests
+      runAfter:
+        - npm-install
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: build-and-push
+      taskRef:
+        name: build-and-push
+      runAfter:
+        - run-jasmine-tests
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: image
+          value: $(params.image)
+
+    - name: deploy-code-engine
+      taskRef:
+        name: deploy-code-engine
+      runAfter:
+        - build-and-push
+      params:
+        - name: image
+          value: $(params.image)
+        - name: app-name
+          value: $(params.app-name)
+        - name: project
+          value: $(params.ce-project)

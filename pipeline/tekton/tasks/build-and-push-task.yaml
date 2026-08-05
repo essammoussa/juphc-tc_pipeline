@@ -1,0 +1,29 @@
+# pipeline/tekton/tasks/build-and-push-task.yaml
+#
+# Builds the Docker image from the Dockerfile and pushes it to
+# IBM Container Registry. Only reached if run-unit-tests succeeded.
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-and-push
+spec:
+  params:
+    - name: image
+      description: Full image reference to build and push, e.g. us.icr.io/mynamespace/tax-calculator:latest
+      type: string
+  workspaces:
+    - name: source
+      description: Workspace containing the cloned application source
+  steps:
+    - name: build-and-push
+      image: quay.io/buildah/stable:v1.35.0
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+      script: |
+        #!/bin/sh
+        set -eu
+        echo "Building image $(params.image)..."
+        buildah bud -t "$(params.image)" .
+        echo "Pushing image $(params.image)..."
+        buildah push "$(params.image)"

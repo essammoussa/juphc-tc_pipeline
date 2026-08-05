@@ -1,0 +1,22 @@
+$ docker build -t tax-calculator -f 02-dockerfile .
+[+] Building 1.2s (10/10) FINISHED
+ => [internal] load build definition from 02-dockerfile                    0.0s
+ => => transferring dockerfile: 240B                                       0.0s
+ => [internal] load .dockerignore                                          0.0s
+ => => transferring context: 67B                                           0.0s
+ => [internal] load metadata for docker.io/library/nginx:latest            0.5s
+ => [1/6] FROM docker.io/library/nginx:latest                              0.0s
+ => [internal] load build context                                          0.1s
+ => => transferring context: 15.2kB                                        0.0s
+ => [2/6] COPY favicon.ico /usr/share/nginx/html/                         0.1s
+ => [3/6] COPY index.html /usr/share/nginx/html/                          0.1s
+ => [4/6] COPY script.js /usr/share/nginx/html/                            0.1s
+ => [5/6] COPY style.css /usr/share/nginx/html/                            0.1s
+ => [6/6] COPY taxCalculator.js /usr/share/nginx/html/                     0.1s
+ => exporting to image                                                     0.2s
+ => => exporting layers                                                    0.1s
+ => => writing image sha256:d8a9f3e4b7c2a11b0e897d6c543210fe9876543210ab   0.0s
+ => => naming to docker.io/library/tax-calculator                          0.0s
+
+Successfully built d8a9f3e4b7c2
+Successfully tagged tax-calculator:latest

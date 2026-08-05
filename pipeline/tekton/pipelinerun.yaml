@@ -1,0 +1,35 @@
+# pipeline/tekton/pipelinerun.yaml
+#
+# Triggers tax-calculator-pipeline. Use this as-is for the FIRST deploy
+# (Objective 3). After making the Objective 4 config change and pushing
+# it to your repo, apply this same file again (Tekton auto-generates a
+# new run) to redeploy (Objective 5) — no pipeline changes needed,
+# because the pipeline always builds from whatever is currently in the
+# repo at $(params.revision).
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: tax-calculator-pipeline-run-
+spec:
+  pipelineRef:
+    name: tax-calculator-pipeline
+  params:
+    - name: repo-url
+      value: "https://github.com/essammoussa/tax-calculator.git"
+    - name: revision
+      value: main
+    - name: image
+      value: "us.icr.io/<your-namespace>/tax-calculator:latest"
+    - name: app-name
+      value: tax-calculator
+    - name: ce-project
+      value: "<your-code-engine-project-name>"
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
